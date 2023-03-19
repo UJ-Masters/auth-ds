@@ -18,23 +18,17 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan({"com.uj.masters"})
 public class AuthorizationServerApp {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AuthorizationServerApp.class);
+    private static final Logger LOG = LoggerFactory.getLogger(AuthorizationServerApp.class);
 
-	public static void main(String[] args) {
-		SpringApplication.run(AuthorizationServerApp.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(AuthorizationServerApp.class, args);
+    }
 
-	@Bean
-	ApplicationListener<ApplicationReadyEvent> onApplicationReadyEventListener(ServerProperties serverProperties,
-																			   KeycloakServerProperties keycloakServerProperties) {
-
-		return (evt) -> {
-
-			Integer port = serverProperties.getPort();
-			String keycloakContextPath = keycloakServerProperties.getContextPath();
-
-			LOG.info("Embedded Keycloak started: http://localhost:{}{} to use keycloak", port, keycloakContextPath);
-		};
-	}
+    @Bean
+    ApplicationListener<ApplicationReadyEvent> onApplicationReadyEventListener(ServerProperties serverProperties,
+                                                                               KeycloakServerProperties keycloakServerProperties) {
+        return (evt) ->
+                LOG.info("Embedded Keycloak started: http://localhost:{}{} to use keycloak", serverProperties.getPort(), keycloakServerProperties.getContextPath());
+    }
 
 }
