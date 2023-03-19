@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration;
 import javax.naming.*;
 import javax.naming.spi.NamingManager;
 import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 @Configuration
 public class EmbeddedKeycloakConfig {
@@ -46,7 +48,7 @@ public class EmbeddedKeycloakConfig {
 	}
 
 	private void mockJndiEnvironment(DataSource dataSource) throws NamingException {
-		NamingManager.setInitialContextFactoryBuilder((env) -> (environment) -> new InitialContext() {
+		NamingManager.setInitialContextFactoryBuilder(env -> environment -> new InitialContext() {
 
 			@Override
 			public Object lookup(Name name) {
@@ -70,7 +72,22 @@ public class EmbeddedKeycloakConfig {
 
 			@Override
 			public void close() {
+				Connection connection = null;
 				// NOOP
+				try {
+					connection = dataSource.getConnection();
+					connection.close();
+				} catch (SQLException e) {
+					throw new RuntimeException(e);
+				}finally {
+					if(connection!=null){
+						try {
+							connection.close();
+						} catch (SQLException e) {
+							throw new RuntimeException(e);
+						}
+					}
+				}
 			}
 		});
 	}
